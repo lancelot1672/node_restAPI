@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 app.use(express.json());
 
+const db = require('./lib/db/dataBase');
+
 const {check, validationResult} = require('express-validator');
 
 // express에는 json 데이터를 파싱하는 모듈이 내장되어있다.
@@ -12,9 +14,43 @@ app.use(express.urlencoded({
 
 app.post(
     '/api/auth/join', [
-    check("username","이메일 형식이 아닙니다.").trim().bail().isEmail(), 
+    check("username","이메일 형식이 아닙니다.").trim().bail().isEmail().custom((value, {request}) => {
+        return new Promise((resolve, reject) =>{
+            var length = 0;
+            db.getConnection(function(connErr, connection){
+ 
+                if(connErr){
+                    console.log(connErr);
+                }
+                connection.query(`select * from d_board where id=?`,[value], function(error, result){
+                    if(result.length > 0){
+                        reject(new Error('이미 존재하는 이메일입니다.'));
+                    }
+                    resolve(true);
+                });
+                connection.release();   //Connection Pool 반환
+            });
+        });
+    }), 
     check("password","비밀번호는 최소 8자리 이상입니다.").trim().bail().exists().isLength({min:8}),
-    check("name","이름을 입력해주세요").trim().not().exists().isEmpty()
+    check("name","이름을 입력해주세요").trim().exists().not().isEmpty(),
+    check("nickname","닉네임을 입력해주세요").trim().exists().custom((value, {request}) => {
+        return new Promise((resolve, reject) =>{
+            db.getConnection(function(connErr, connection){
+                if(connErr){
+                    console.log(connErr);
+                }
+                connection.query(`select * from d_board where nickname=?`,[value], function(error, result){
+                    console.log(result.length);
+                    if(result.length > 0){
+                        reject(new Error('이미 존재하는 닉네임입니다.'));
+                    }
+                    resolve(true);
+                });
+                connection.release();   //Connection Pool 반환
+            });
+        });
+    })
     ],
     async (request, response) =>{
     // Error
@@ -25,10 +61,15 @@ app.post(
         // 데이터 받기
         var body = request.body;
         console.log(body);
-        
-        //db에 넣기
 
-    //200 코드와 return
+        //db에 넣기
+        db.getConnection(function(connErr, conn){
+            conn.query(`insert into d_board VALUES(?,?,?,?)`,[body.username, body.password, body.name, body.nickname],function(err,result){
+
+            });
+            conn.release();
+        });
+        //200 코드와 return
         response.status(200).send(body);
     }
 

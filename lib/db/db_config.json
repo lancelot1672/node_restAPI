@@ -1,0 +1,7 @@
+{
+    "host" : "localhost",
+    "user" : "dore",
+    "password" : "abcd1234",
+    "database" : "board",
+    "connectionLimit" : 30
+}
