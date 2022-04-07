@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "crypto": "^1.0.1",
     "express-validator": "^6.14.0",
     "mysql": "^2.18.1"
   }

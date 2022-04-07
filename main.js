@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 app.use(express.json());
 
+const bcrypt = require('bcrypt');
+
 const db = require('./lib/db/dataBase');
 
 const {check, validationResult} = require('express-validator');
@@ -11,6 +13,26 @@ const {check, validationResult} = require('express-validator');
 app.use(express.urlencoded({
   extended: true
 }))
+app.post('/api/auth/login', async (request, response) =>{
+    //이메일, 비밀번호 받기
+    var body = request.body;
+    db.getConnection(function(connErr, conn){
+        conn.query(`select * from d_board where id=?`,[body.username],function(err,result){
+            if(err){
+                throw err;
+            }
+            bcrypt.compare(body.password, result[0].password, (err, same) => {
+                // async callback
+                if(same){
+                    response.status(200).send(body);
+                }else{
+                    response.status(400).send({"message" : "아이디 혻은 비밀번호 오류"});
+                }
+              });
+        });
+        conn.release();
+    });
+});
 
 app.post(
     '/api/auth/join', [
@@ -61,11 +83,19 @@ app.post(
         // 데이터 받기
         var body = request.body;
         console.log(body);
+        
+        //비밀번호 암호화
+        const encryptedPassowrd = bcrypt.hashSync(body.password, 10);
 
         //db에 넣기
         db.getConnection(function(connErr, conn){
-            conn.query(`insert into d_board VALUES(?,?,?,?)`,[body.username, body.password, body.name, body.nickname],function(err,result){
-
+            if(connErr){
+                throw connErr;
+            }
+            conn.query(`insert into d_board VALUES(?,?,?,?)`,[body.username, encryptedPassowrd, body.name, body.nickname],function(err,result){
+                if(err){
+                    throw err;
+                }
             });
             conn.release();
         });
@@ -75,10 +105,7 @@ app.post(
 
 });
 
-app.get('api/auth/login', function(request, response){
-
-});
 
 app.listen(3000, function(){
     console.log('3000 포트에서 대기중~');
-})
+});
