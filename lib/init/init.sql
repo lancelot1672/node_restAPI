@@ -12,7 +12,7 @@ create table member(
     name VARCHAR(20) NOT NULL,
     nickname VARCHAR(30) NOT NULL,
     primary key(id),
-    UNIQUE INDEX `nick` (nickname)
+    UNIQUE INDEX (nickname)
 );
 
 CREATE TABLE d_board(
@@ -25,6 +25,9 @@ CREATE TABLE d_board(
     primary key(id),
     foreign key(author) references member(nickname) on update cascade on delete cascade
 );
+
+insert into member VALUES('test1234@naver.com','abcd1234','테스트','동동목장');
+insert into member VALUES('test1111@naver.com','abcd1234','테스트2','중복닉네임');
 
 insert into d_board VALUES(DEFAULT, 'MySQL','MySQL is ...', '동동목장','IT',DEFAULT);
 insert into d_board VALUES(DEFAULT, 'NodeJs','NodeJs is ...', '중복닉네임','IT',DEFAULT);
