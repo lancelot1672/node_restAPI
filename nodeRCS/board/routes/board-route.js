@@ -5,6 +5,6 @@ const router = express.Router();
 const BoardController = require('../controller/board-controller');
 
 //router
-router.get('/list', BoardController.js);
+router.get('/list', BoardController.findAll);
 
 module.exports = router;
