@@ -13,6 +13,16 @@ exports.findAll = async(request, response, next) =>{
         return response.status(500).json(err);
     }
 }
+exports.findById = async(request, response, next) =>{
+    var pageId = request.params.pageId;
+    try{
+        let result = await BoardService.findById(pageId);
+        return response.json(result);
+    }catch(err){
+        console.log(err);
+        return response.status(500).json(err);
+    }
+}
 // async (req, res, next) => {
 //     let { boardId } = req.params
 //     try {
