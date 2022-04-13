@@ -1,11 +1,17 @@
 //validator
 const { validationResult } = require("express-validator");
+
+//service
 const MemberService = require('../services/memberService')
-exports.findLogin = async(request, response, next) =>{
+
+exports.login = async(request, response, next) =>{
+    //id, password 받기
+    var body = request.body;
+
     // 로그인 체크 로직
     try{
-        let result = await MemberService.findLogin();
-        return response.json(result);
+        let result = await MemberService.login(body);
+        return response.status(200).send(result);
     }catch(err){
         return response.status(400).json(err);
     }
@@ -19,9 +25,14 @@ exports.save = async(request, response) =>{
         // 데이터 받기
         var body = request.body;
         console.log(body);
+
+        let result = await MemberService.save(body);
+
+        response.status(200).send(result);
     }
 }
 exports.existId = async(email) =>{
+    // 아이디(이메일) 중복 체크
     try{
         let result = await MemberService.existId(email);
         return result;
@@ -30,6 +41,7 @@ exports.existId = async(email) =>{
     }
 }
 exports.existNickName = async(nickName) =>{
+    // 닉네임 중복 체크
     try{
         let result = await MemberService.existNickName(nickName);
         return result;

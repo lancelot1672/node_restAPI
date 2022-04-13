@@ -11,7 +11,7 @@ const bcrypt = require('bcrypt');
 const MemberController = require('../controller/member-controller');
 
 //router
-//router.get('/auth/login', BoardController.findAll);
+router.post('/login', MemberController.login);
 router.post('/join',
 [
     check("username","이메일 형식이 아닙니다.").trim().bail().isEmail().custom(async value => {
