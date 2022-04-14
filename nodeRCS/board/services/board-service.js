@@ -6,13 +6,13 @@ exports.findAll = async() =>{
    try {
        //이렇게 받아야함.
         const [result] = await conn.query(BoardQuery.findAll);
-        conn.release();
         return result;
     } catch(err) {
-        console.log('Query Error');
+        console.log('Board findAll Query Error');
+        throw err;
+    }finally{
         conn.release();
-        return false;
-    }
+     }
 }
 exports.findById = async(pageId) =>{
     const conn = await db.getConnection(async conn => conn);
@@ -21,14 +21,26 @@ exports.findById = async(pageId) =>{
         const [result] = await conn.query(BoardQuery.findById,[pageId]);
         console.log('result',result.le);
 
-        //connection 반환
-        conn.release();
-
         //넘겨주기
         return result;
      } catch(err) {
         console.log('Query Error');
+        throw err;
+
+     }finally{
         conn.release();
-        return false;
+     }
+ }
+ exports.updateBoard = async(body) =>{
+    //글 제목, 내용을 받아 글 수정
+    const conn = await db.getConnection(async conn => conn);
+    try{
+        const [result] = await conn.query(BoardQuery.updateBoard, [body.title, body.description, body.id]);
+        
+    }catch(err){
+        console.log('Board Update Query Error');
+        throw err;
+    }finally{
+        conn.release();
      }
  }
