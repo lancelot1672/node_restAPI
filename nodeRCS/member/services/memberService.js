@@ -13,14 +13,12 @@ exports.existId = async(email) =>{
    try {
        //이렇게 받아야함.
         const [result] = await conn.query(MemberQuery.existId,[email]);
-        console.log('result',result[0].result);
-        
-        conn.release();
         return result[0].result;
     } catch(err) {
-        console.log('Query Error');
+        console.log('Query Error  At existId');
+        throw err;
+    }finally{
         conn.release();
-        return false;
     }
 }
 exports.existNickName = async(nickname) =>{
@@ -30,12 +28,12 @@ exports.existNickName = async(nickname) =>{
        //이렇게 받아야함.
         const [result] = await conn.query(MemberQuery.existNinkName,[nickname]);
         
-        conn.release();
         return result[0].result;
     } catch(err) {
-        console.log('Query Error');
+        console.log('Query Error At NickName');
+        throw err;
+    }finally{
         conn.release();
-        return false;
     }
 }
 exports.save = async(body) =>{
@@ -53,8 +51,9 @@ exports.save = async(body) =>{
         return body;
     }catch(err){
         console.log('Query Error');
+        throw err;
+    }finally{
         conn.release();
-        return false;
     }
 }
 exports.login = async(body) =>{
@@ -65,17 +64,14 @@ exports.login = async(body) =>{
 
         console.log(result[0]);
         //비밀번호 검증
-        try{
-            const same = await bcrypt.compare(body.password, result[0].password);
-            if(same){
-                return result[0];
-            }
-        }catch(err){
-
+        const same = await bcrypt.compare(body.password, result[0].password);
+        if(same){
+            return result[0];
         }
     }catch(err){
-        console.log('Query Error');
-        return false;
+        console.log('Query Error At login');
+        console.log(err);
+        throw err;
     }finally{
         conn.release();
     }

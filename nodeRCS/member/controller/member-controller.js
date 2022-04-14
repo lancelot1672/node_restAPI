@@ -11,9 +11,17 @@ exports.login = async(request, response, next) =>{
     // 로그인 체크 로직
     try{
         let result = await MemberService.login(body);
-        return response.status(200).send(result);
+        // res.send
+        // res.send json send 과정 호출
+        // res.json
+        // res.json send 과정 호출
+        return response.status(200).json(result);
+        //return을 사용하면 여기서 끝.
+
+        console.log('호출될까??');
+
     }catch(err){
-        return response.status(400).json(err);
+        response.status(400).json({"message":"아이디 비밀번호 확인"});
     }
 }
 exports.save = async(request, response) =>{
@@ -28,7 +36,7 @@ exports.save = async(request, response) =>{
 
         let result = await MemberService.save(body);
 
-        response.status(200).send(result);
+        return response.status(200).json(result);
     }
 }
 exports.existId = async(email) =>{
